@@ -78,6 +78,15 @@ class RssCrawler:
             with open(localFileName, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
 
+    def _downloadMedia(self, obj, recursive=True):
+        # crawl media contents
+        for image in obj.find_all("itunes:image", recursive=recursive):
+            self._downloadFile(image["href"])
+        for image in obj.find_all("img", recursive=recursive):
+            self._downloadFile(image["href"])
+        for audio in obj.find_all("enclosure", recursive=recursive):
+            self._downloadFile(audio["url"])
+
     def crawl(self) -> None:
         self.logger.info("Start crawling %s", self.url)
         self._createDirectory(self.basedir)
@@ -104,8 +113,7 @@ class RssCrawler:
             self._createDirectory(channelPath)
 
             # crawl media contents
-            for image in channel.find_all("itunes:image", recursive=False):
-                self._downloadFile(image["href"])
+            self._downloadMedia(channel, recursive=False)
 
             for article in channel.find_all('item'):
                 self.logger.info("Archiving article %s", article.title.string)
@@ -115,13 +123,9 @@ class RssCrawler:
                 # save item metadata
                 self._saveToFile(article, os.path.join(itemPath, "metadata.part.xml"))
 
-                # crawl media contents
-                for image in article.find_all("itunes:image"):
-                    self._downloadFile(image["href"])
-                for img in article.find_all("img"):
-                    self._downloadFile(image["href"])
-                for audio in article.find_all("enclosure"):
-                    self._downloadFile(audio["url"])
+                # archive media content
+                self._downloadMedia(article)
+                
 
         r.close()
 
