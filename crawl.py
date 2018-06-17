@@ -63,6 +63,10 @@ class RssCrawler:
         os.makedirs(os.path.normcase(os.path.normpath(path)), exist_ok=True)
 
     def _downloadFile(self, url, force=None):
+        if url == None:
+            self.logger.warn("Downloading empty URL")
+            return
+
         if force == None:
             force = self.forceRedownload
         localFileName = os.path.join(self.basedir, "media", os.path.normcase(os.path.normpath("/".join(map(self._toLegalFilename, filter(len, url.split("/")))))))
@@ -92,6 +96,9 @@ class RssCrawler:
             self._downloadFile(image["href"])
         for image in obj.find_all("img", recursive=recursive):
             self._downloadFile(image["href"])
+        if obj.image:
+            if obj.image.url:
+                self._downloadFile(obj.image.url.string)
         for audio in obj.find_all("enclosure", recursive=recursive):
             self._downloadFile(audio["url"])
 
