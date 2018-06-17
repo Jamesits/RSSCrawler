@@ -27,6 +27,9 @@ class RssCrawler:
         self.basedir = basedir
         self.forceRedownload = forceRedownload
         self.proxies = proxies or {}
+        self.headers = {
+            'User-Agent': 'RSSCrawler(https://github.com/Jamesits/RSSCrawler)',
+        }
 
         self.downloadedFileCache = set()
 
@@ -75,7 +78,7 @@ class RssCrawler:
 
         self.logger.debug("Downloading %s", url)
         self.downloadedFileCache.add(url)
-        with self._retry(lambda:requests.get(url, stream=True, proxies=self.proxies), connectionRetryTimes) as r:
+        with self._retry(lambda:requests.get(url, stream=True, proxies=self.proxies, headers=self.headers), connectionRetryTimes) as r:
             r.raw.decode_content = True
             with open(localFileName, 'wb') as f:
                 shutil.copyfileobj(r.raw, f)
@@ -101,7 +104,7 @@ class RssCrawler:
         }, default=str, indent=4), os.path.join(self.basedir, "config.json"))
         
         self.logger.debug("Downloading RSS description...")
-        r = self._retry(lambda:requests.get(self.url, proxies=self.proxies), connectionRetryTimes)
+        r = self._retry(lambda:requests.get(self.url, proxies=self.proxies, headers=self.headers), connectionRetryTimes)
         self.logger.debug("Status=%d, Type='%s', Encoding=%s", r.status_code, r.headers['content-type'] or "None", r.encoding)
 
         self.logger.debug("Saving RSS description...")
