@@ -43,7 +43,7 @@ class RssCrawler:
             self.logger.debug("Trying %d times, max %d times...", triedTimes, retryTimes)
             try:
                 return func()
-            except e:
+            except Exception as e:
                 self.logger.error(e)
 
     def _saveToFile(self, s: str, filename: str) -> None:
