@@ -17,6 +17,7 @@ defaultEncoding = "utf-8"
 tasksDef = "./tasks.txt"
 resultDir = "./result"
 connectionRetryTimes = 3
+forceRedownload = False
 proxies = {}
 
 # customized config
@@ -146,5 +147,5 @@ if __name__ == "__main__":
                 url, alias = normalizedLine.split(maxsplit=1)
                 datastore = os.path.join(resultDir, alias)
 
-                crawler = RssCrawler(url, alias, datastore, forceRedownload=True)
+                crawler = RssCrawler(url, alias, datastore, forceRedownload=forceRedownload)
                 crawler.crawl()
