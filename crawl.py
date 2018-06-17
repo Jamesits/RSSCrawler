@@ -9,14 +9,16 @@ import platform
 import shutil
 from bs4 import BeautifulSoup
 
+
+# default config
 defaultEncoding = "utf-8"
 tasksDef = "./tasks.txt"
 resultDir = "./result"
 connectionRetryTimes = 3
-proxies = { 
-    "http": "http://localhost:1080", 
-    "https": "http://localhost:1080",
-}
+proxies = {}
+
+# customized config
+from config import *
 
 class RssCrawler:
     def __init__(self, url, alias, basedir, proxies=None, forceRedownload=False) -> None:
@@ -136,7 +138,7 @@ if __name__ == "__main__":
         for line in tasks.readlines():
             normalizedLine = line.strip()
             if len(normalizedLine) > 0 and not normalizedLine.startswith("#"):  # exclude comment
-                url, alias = normalizedLine.split(" ", maxsplit=1)
+                url, alias = normalizedLine.split(maxsplit=1)
                 datastore = os.path.join(resultDir, alias)
 
                 crawler = RssCrawler(url, alias, datastore, forceRedownload=True)
